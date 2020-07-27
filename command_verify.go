@@ -5,13 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io"
-	"os"
-
-	"github.com/certifi/gocertifi"
 	"github.com/mastahyeti/cms"
 	"github.com/pkg/errors"
+	"io"
+	"os"
 )
+
 
 func commandVerify() error {
 	sNewSig.emit()
@@ -165,21 +164,14 @@ func verifyDetached() error {
 }
 
 func verifyOpts() x509.VerifyOptions {
-	roots, err := x509.SystemCertPool()
-	if err != nil {
-		// SystemCertPool isn't implemented for Windows. fall back to mozilla trust
-		// store.
-		roots, err = gocertifi.CACerts()
-		if err != nil {
-			// Fall back to an empty store. Verification will likely fail.
-			roots = x509.NewCertPool()
-		}
-	}
+	var (
+		roots *x509.CertPool
+	)
 
-	for _, ident := range idents {
-		if cert, err := ident.Certificate(); err == nil {
-			roots.AddCert(cert)
-		}
+	// Depending on the operating system, enumerate the trusted root certificate store
+	err := parseRoots(roots)
+	if err != nil{
+		roots = x509.NewCertPool()
 	}
 
 	return x509.VerifyOptions{
@@ -187,3 +179,4 @@ func verifyOpts() x509.VerifyOptions {
 		KeyUsages: []x509.ExtKeyUsage{x509.ExtKeyUsageAny},
 	}
 }
+
