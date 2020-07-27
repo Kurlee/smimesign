@@ -36,12 +36,12 @@ func TestSignIncludeCertsAIA(t *testing.T) {
 	certs, err := sd.X509Certificates()
 	require.NoError(t, err)
 
-	require.Equal(t, 2, len(certs))
-	require.True(t, certs[0].Equal(aiaLeaf.Certificate))
 	t.Logf("source Cert First byte %q", certs[0].Raw[0] )
 	t.Logf("stored Cert First byte %q", aiaLeaf.Certificate.Raw[0] )
 	t.Logf("source Cert second byte %q", certs[0].Raw[1] )
 	t.Logf("stored Cert second byte %q", aiaLeaf.Certificate.Raw[1] )
+	require.Equal(t, 2, len(certs))
+	require.True(t, certs[0].Equal(aiaLeaf.Certificate))
 	require.True(t, certs[1].Equal(intermediate.Certificate))
 }
 
